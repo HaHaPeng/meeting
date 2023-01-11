@@ -3,18 +3,27 @@
 		{
 			"path": "pages/meeting/meeting",
 			"style": {
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": true
+				// "navigationStyle": "custom",
+				// "enablePullDownRefresh": true
+				"navigationBarTitleText": "会议列表"
 			}
 		},
 		{
 			"path": "pages/my/my",
 			"style": {
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": true
+				"navigationBarTitleText": "添加会议"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/info/info",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "会议详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",

@@ -1,52 +1,79 @@
 <template>
-	<view class="add-meeting">
-		<u--form labelPosition="left" labelWidth="90" :model="model" :rules="rules" ref="form">
-			<u-form-item
-				@click="openSelect('timeShow')"
-				label="会议时间"
-				prop="meetingTime"
-				borderBottom
-			>
-				<u--text type="info" :text="meetingTime"></u--text>
-				<u-icon slot="right" name="arrow-right"></u-icon>
-			</u-form-item>
-			<u-form-item label="名称" prop="meetingName" borderBottom><u--input v-model="model.meetingName" border="none" placeholder="请输入名称"></u--input></u-form-item>
-			<u-form-item label="描述" prop="meetingDesc" borderBottom><u--textarea v-model="model.meetingDesc" placeholder="请输入描述"></u--textarea></u-form-item>
-			<u-form-item label="主讲人" prop="meetingSpeaker" borderBottom>
-				<u--input v-model="model.meetingSpeaker" border="none" placeholder="请输入主讲人"></u--input>
-			</u-form-item>
-			<u-form-item
-				@click="openSelect('statusShow')"
-				label="状态"
-				prop="meetingStatus"
-				borderBottom
-			>
-				<u--input v-model="model.meetingStatus" disabled disabledColor="#ffffff" placeholder="请选择状态" border="none"></u--input>
-				<u-icon slot="right" name="arrow-right"></u-icon>
-			</u-form-item>
+	<u-transition :show="animationShow" mode="fade-right">
+		<view class="add-meeting">
+			<u--form labelPosition="left" labelWidth="80" :model="model" :rules="rules" ref="form">
+				<u-form-item
+					label="开始时间"
+					prop="endTime"
+					borderBottom
+					@click="startTimeShow = true"
+				>
+					<u--input :value="$u.timeFormat(model.startTime, 'yyyy-mm-dd hh:MM:ss')" disabled disabledColor="#ffffff" placeholder="请选择开始时间" border="none"></u--input>
+					<u-icon slot="right" name="arrow-right"></u-icon>
+				</u-form-item>
+				<u-form-item
+					label="结束时间"
+					prop="endTime"
+					borderBottom
+					@click="endTimeShow = true"
+				>
+					<u--input :value="$u.timeFormat(model.endTime, 'yyyy-mm-dd hh:MM:ss')" disabled disabledColor="#ffffff" placeholder="请选择结束时间" border="none"></u--input>
+					<u-icon slot="right" name="arrow-right"></u-icon>
+				</u-form-item>
+				<u-form-item
+					@click="openSelect('statusShow')"
+					label="状态"
+					prop="meetingStatus"
+					borderBottom
+				>
+					<u--input v-model="model.meetingStatus" disabled disabledColor="#ffffff" placeholder="请选择状态" border="none"></u--input>
+					<u-icon slot="right" name="arrow-right"></u-icon>
+				</u-form-item>
+				<u-form-item label="名称" prop="meetingName" borderBottom><u--input v-model="model.meetingName" border="none" placeholder="请输入名称"></u--input></u-form-item>
+				<u-form-item label="主讲人" prop="meetingSpeaker" borderBottom>
+					<u--input v-model="model.meetingSpeaker" border="none" placeholder="请输入主讲人"></u--input>
+				</u-form-item>
+				<u-form-item label="所属部门" prop="dept" borderBottom><u--input v-model="model.dept" border="none" placeholder="请输入所属部门"></u--input></u-form-item>
+				
+				<u-form-item label="会议封面" prop="meetingCover" borderBottom>
+					<u-upload :fileList="meetingCover" @afterRead="afterRead" @delete="deletePic" name="meetingCover" multiple :maxCount="1" :previewFullImage="true"></u-upload>
+				</u-form-item>
+				<u-form-item label="详情图" prop="detailImg" borderBottom>
+					<u-upload :fileList="detailImg" @afterRead="afterRead" @delete="deletePic" name="detailImg" multiple :maxCount="1" :previewFullImage="true"></u-upload>
+				</u-form-item>
+				
+				<u-form-item label="描述" prop="meetingDesc" borderBottom><u--textarea :maxlength="-1"  v-model="model.meetingDesc" placeholder="请输入描述"></u--textarea></u-form-item>
+			</u--form>
+			
+			<u-datetime-picker
+				ref="datetimePicker"
+				:show="startTimeShow"
+				v-model="model.startTime"
+				mode="datetime"
+				@cancel="startTimeShow = false"
+				@confirm="startTimeShow = false"
+			></u-datetime-picker>
+			<u-datetime-picker
+				ref="datetimePicker"
+				:show="endTimeShow"
+				v-model="model.endTime"
+				mode="datetime"
+				@cancel="endTimeShow = false"
+				@confirm="endTimeShow = false"
+			></u-datetime-picker>
 
-			<u-form-item label="会议封面" prop="meetingCover" borderBottom>
-				<u-upload :fileList="meetingCover" @afterRead="afterRead" @delete="deletePic" name="meetingCover" multiple :maxCount="1" :previewFullImage="true"></u-upload>
-			</u-form-item>
-			<u-form-item label="所属部门" prop="dept" borderBottom><u--input v-model="model.dept" border="none" placeholder="请输入所属部门"></u--input></u-form-item>
-			<u-form-item label="详情图" prop="detailImg" borderBottom>
-				<u-upload :fileList="detailImg" @afterRead="afterRead" @delete="deletePic" name="detailImg" multiple :maxCount="1" :previewFullImage="true"></u-upload>
-			</u-form-item>
-		</u--form>
+			<view class="footer-btn">
+				<u-button type="primary" @click="submit">提交</u-button>
+				<view style="height: 20px;"></view>
+				<u-button type="error" v-if="isEdit" @click="cancelShow = true">删除</u-button>
+			</view>
 
-		<view class="footer-btn">
-			<u-button type="primary" @click="submit">提交</u-button>
-			<view style="height: 20px;"></view>
-			<u-button type="error" v-if="isEdit" @click="cancelShow = true">删除</u-button>
+			<!-- 删除确认 -->
+			<u-modal @cancel="cancelShow = false" @confirm="cancel" :show="cancelShow" title="提示" content='确认删除？'></u-modal>
+			<!-- 状态 -->
+			<u-action-sheet :show="statusShow" :actions="statusOptions" title="请选择状态" @close="statusShow = false" @select="statusSelect"></u-action-sheet>
 		</view>
-
-		<!-- 删除确认 -->
-		<u-modal @cancel="cancelShow = false" @confirm="cancel" :show="cancelShow" title="提示" content='确认删除？'></u-modal>
-		<!-- 状态 -->
-		<u-action-sheet :show="statusShow" :actions="statusOptions" title="请选择状态" @close="statusShow = false" @select="statusSelect"></u-action-sheet>
-		<!-- 时间 -->
-		<u-calendar :show="timeShow" mode="range" @confirm="confirmTime"></u-calendar>
-	</view>
+	</u-transition>
 </template>
 
 <script>
@@ -54,10 +81,11 @@ import api from "@/config/api.js"
 export default {
 	data() {
 		return {
-			meetingTime: '请选择时间',
-			model: {
-				startTime: 0, // 会议开始时间
-				endTime: 0, // 会议结束时间
+			endTimeShow: false,
+			startTimeShow: false,
+			defaultModel: {
+				startTime: new Date().getTime(), // 会议开始时间
+				endTime: new Date().getTime(), // 会议结束时间
 				meetingName: '', // 会议名称
 				meetingDesc: '', // 会议描述
 				meetingSpeaker: '', // 会议主讲人
@@ -66,6 +94,7 @@ export default {
 				dept: '', // 所属部门
 				detailImg: '' // 会议详情图
 			},
+			model: {},
 			rules: {
 				meetingName: {
 					type: 'string',
@@ -89,37 +118,53 @@ export default {
 					value: 3
 				}
 			],
-			timeShow: false,
 			statusShow: false,
 			cancelShow: false,
 			meetingCover: [],
 			detailImg: [],
-			isEdit: false
+			isEdit: false,
+			animationShow: false
 		};
 	},
 	onLoad(options) {
-		console.log(options)
+		this.animationShow = true
 		if(options.row) {
 			const model = JSON.parse(options.row)
-			this.meetingTime = this.$u.timeFormat(model.startTime, "yyyy-mm-dd hh:MM:ss") + " ~ " + this.$u.timeFormat(model.endTime, "yyyy-mm-dd HH:mm:ss")
-			model.meetingStatus = this.statusOptions.find(item => item.value == model.meetingStatus).name
-			this.meetingCover.push({
-				url: model.meetingCover
-			})
-			this.detailImg.push({
-				url: model.detailImg
-			})
+			// model.meetingStatus = this.statusOptions.find(item => item.value == model.meetingStatus).name
+			if(model.meetingCover) {
+				this.meetingCover.push({
+					url: model.meetingCover
+				})
+			}
+			if(model.detailImg) {
+				this.detailImg.push({
+					url: model.detailImg
+				})
+			}
 			this.model = model
 			this.isEdit = true
 		} else {
 			this.isEdit = false
+			this.init()
 		}
 	},
 	methods: {
+		init() {
+			this.model = JSON.parse(JSON.stringify(this.defaultModel))
+		},
+		goToMeeting() {
+			setTimeout(() => {
+				uni.reLaunch({
+					url: '/pages/meeting/meeting'
+				});
+				this.init()
+			}, 1000)
+		},
 		cancel() {
 			api.deleteMeeting({ id: this.model.id }).then(() => {
 				uni.$u.toast('删除成功');
 				this.cancelShow = false
+				this.goToMeeting()
 			})
 		},
 		openSelect(name) {
@@ -140,20 +185,28 @@ export default {
 					message: '上传中'
 				});
 			});
-			console.log(this[event.name])
 			for (let i = 0; i < lists.length; i++) {
 				const result = await this.uploadFilePromise(lists[i].url);
-				this.model[event.name] = result.url
-				let item = this[event.name][fileListLen];
-				this[event.name].splice(
-					fileListLen,
-					1,
-					Object.assign(item, {
-						status: 'success',
-						message: '',
-						url: result.url
-					})
-				);
+				console.log(result)
+				if(result) {
+					this.model[event.name] = result.url
+					let item = this[event.name][fileListLen];
+					this[event.name].splice(
+						fileListLen,
+						1,
+						Object.assign(item, {
+							status: 'success',
+							message: '',
+							url: result.url
+						})
+					);
+				} else {
+					let item = this[event.name][fileListLen];
+					this[event.name].splice(
+						fileListLen,
+						1
+					);
+				}
 				fileListLen++;
 			}
 		},
@@ -167,8 +220,17 @@ export default {
 						user: 'test'
 					},
 					success: res => {
-						const result = JSON.parse(res.data).data
-						resolve(result)
+						if(res.statusCode == 200) {
+							const result = JSON.parse(res.data).data
+							resolve(result)
+						} else {
+							uni.$u.toast('上传失败');
+							resolve(false)
+						}
+					},
+					fail: res => {
+						uni.$u.toast('上传失败');
+						resolve(false)
 					}
 				});
 			});
@@ -179,32 +241,21 @@ export default {
 			this.$refs.form
 				.validate()
 				.then(res => {
-					console.log(this.model);
 					if(this.isEdit) {
 						api.updateMeeting(data).then(() => {
 							uni.$u.toast('更新成功');
+							this.goToMeeting()
 						})
 					} else {
 						api.addMeeting(data).then(() => {
 							uni.$u.toast('添加成功');
+							this.goToMeeting()
 						})
 					}
 				})
 				.catch(errors => {
 					uni.$u.toast('请填写内容');
 				});
-		},
-		confirmTime(e) {
-			if (e.length > 1) {
-				const startTime = e[0];
-				const endTime = e[e.length - 1];
-				this.meetingTime = startTime + ' ~ ' + endTime;
-				this.model.startTime = new Date(startTime).getTime();
-				this.model.endTime = new Date(endTime).getTime();
-			} else {
-				this.meetingTime = '请选择时间';
-			}
-			this.timeShow = false;
 		},
 		statusSelect(e) {
 			this.model.meetingStatus = e.name;
@@ -216,7 +267,7 @@ export default {
 
 <style lang="scss" scoped>
 .add-meeting {
-	padding: 0 2px;
+	padding: 0 6px;
 }
 .footer-btn {
 	padding: 0 20px;

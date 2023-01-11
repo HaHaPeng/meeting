@@ -2,15 +2,19 @@
 	<view class="meeting">
 		<view class="m-h">
 			<view class="list-header">
-				<view class="title-year"><u--text :size="20" type="warning" :text="nowYear"></u--text></view>
+				<view class="title-year" @click="yearShow = true"><u--text :size="20" type="warning" :text="nowYear"></u--text></view>
 				<view class="title-search">
-					<u--input @confirm="search" placeholder="请输入内容" suffixIcon="search" suffixIconStyle="font-size: 22px;color: #909399"></u--input>
+					<u--input shape="circle" color="#ffffff" v-model="params.content" placeholder="请输入内容" suffixIcon="search" suffixIconStyle="font-size: 22px;color: #909399">
+						<template slot="suffix">
+							<u-icon @click="search" name="search" color="#ffffff"></u-icon>
+						</template>
+					</u--input>
 				</view>
 			</view>
 			<view>
 				<u-tabs 
 					:list="timeList" 
-					@click="click"
+					@click="chooseMonth"
 					lineColor="#f9ae3d"
 					:inactiveStyle="{ color: '#ffffff' }"
 					:activeStyle="{ color: '#f9ae3d' }"
@@ -19,6 +23,9 @@
 		</view>
 
 		<view class="list">
+			<view class="list-empty" v-if="cardList.length == 0">
+				<u-empty></u-empty>
+			</view>
 			<u-list @scrolltolower="scrolltolower">
 				<u-list-item v-for="card in cardList" :key="card.id">
 					<view class="card" @click="toEdit(card)">
@@ -46,6 +53,19 @@
 				</u-list-item>
 			</u-list>
 		</view>
+		
+		<!-- 年 -->
+		<u-picker :show="yearShow" :defaultIndex="yearDefault" :columns="yearColumns" @confirm="yearConfirm" @cancel="yearShow = false"></u-picker>
+		<!-- 月 -->
+		<u-calendar 
+			:maxDate="maxDate"
+			:minDate="minDate"
+			:defaultDate="defaultDate"
+			:show="monthShow" 
+			@confirm="monthConfirm"
+			@close="monthShow = false"
+		>
+		</u-calendar>
 	</view>
 </template>
 
@@ -54,8 +74,17 @@ import api from '@/config/api.js';
 export default {
 	data() {
 		return {
+			defaultDate: "",
+			monthShow: false,
+			maxDate: "",
+			minDate: "",
+			yearDefault: [],
+			yearColumns: [],
+			yearShow: false,
 			timeList: [],
 			nowYear: '',
+			nowMonth: "",
+			currenMonth: "",
 			cardList: [],
 			params: {
 				page: 1,
@@ -69,26 +98,63 @@ export default {
 		this.init();
 	},
 	methods: {
+		monthConfirm(val) {
+			this.params.startTime = new Date(val[0]).getTime()
+			this.defaultDate = val[0]
+			this.getList()
+			this.monthShow = false
+		},
+		chooseMonth(val) {
+			this.currenMonth = val.index
+			this.nowMonth = val.value
+			this.monthShow = true
+			this.minDate = `${this.nowYear}-${this.nowMonth}-01`
+			this.maxDate = this.$u.timeFormat(new Date(this.nowYear, this.nowMonth, 0), "yyyy-mm-dd")
+			this.defaultDate = `${this.nowYear}-${this.nowMonth}-01`
+		},
+		yearConfirm(val) {
+			const year = (val.value)[0]
+			this.nowYear = year
+			this.yearDefault = val.indexs
+			this.yearShow = false
+			const arr = this.$u.timeFormat(this.params.startTime, "yyyy-mm-dd").split("-")
+			this.params.startTime = new Date(`${year}-${arr[1]}-${arr[2]}`).getTime()
+			this.getList()
+		},
 		toEdit(row) {
 			uni.reLaunch({
-				url: `/pages/my/my?row=${encodeURIComponent(JSON.stringify(row))}`
-				// url: `/pages/my/my`
+				// url: `/pages/my/my?row=${encodeURIComponent(JSON.stringify(row))}`
+				url: `/pages/info/info?row=${encodeURIComponent(JSON.stringify(row))}`
 			});
 		},
 		init() {
-			// 月份
-			const result = [];
-			for (let i = 1; i < 13; i++) {
-				result.push({
-					name: i + '月'
-				});
-			}
-			this.timeList = result;
-
-			// 时间
 			const now = new Date();
 			const y = now.getFullYear(),
 				m = now.getMonth() + 1;
+			// 月份
+			const result = [];
+			const year = []
+			for (let i = 1; i < 13; i++) {
+				if(i == m) {
+					this.currenMonth = i - 1
+				}
+				result.push({
+					name: i + '月',
+					value: i
+				});
+			}
+			for (let i = 2010; i < 2050; i++) {
+				if(i == y) {
+					this.yearDefault.push(year.length)
+				}
+				year.push(i)
+			}
+			console.log(this.yearDefault)
+			this.timeList = result;
+			this.yearColumns.push(year)
+
+			// 时间
+			
 			this.nowYear = y;
 			const firstDayTime = new Date(y, m - 1, 1).getTime();
 			this.params.startTime = firstDayTime;
@@ -97,7 +163,7 @@ export default {
 		},
 		search() {
 			this.params.page = 1;
-			this.getList();
+			this.$u.throttle(this.getList, 5000)
 		},
 		scrolltolower() {
 			this.params.page++;
@@ -111,7 +177,6 @@ export default {
 					item.time = startStr + ' ~ ' + endStr;
 					return item;
 				});
-				console.log(this.cardList);
 			});
 		}
 	}
@@ -153,6 +218,9 @@ export default {
 .list {
 	margin-top: 16px;
 	padding: 0 10px;
+	.list-empty {
+		margin-top: 60px;
+	}
 	.card {
 		background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
 		padding: 20px;
