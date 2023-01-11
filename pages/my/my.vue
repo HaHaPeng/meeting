@@ -37,9 +37,11 @@
 		<view class="footer-btn">
 			<u-button type="primary" @click="submit">提交</u-button>
 			<view style="height: 20px;"></view>
-			<u-button type="error" v-if="isEdit" @click="submit">删除</u-button>
+			<u-button type="error" v-if="isEdit" @click="cancelShow = true">删除</u-button>
 		</view>
 
+		<!-- 删除确认 -->
+		<u-modal @cancel="cancelShow = false" @confirm="cancel" :show="cancelShow" title="提示" content='确认删除？'></u-modal>
 		<!-- 状态 -->
 		<u-action-sheet :show="statusShow" :actions="statusOptions" title="请选择状态" @close="statusShow = false" @select="statusSelect"></u-action-sheet>
 		<!-- 时间 -->
@@ -89,32 +91,37 @@ export default {
 			],
 			timeShow: false,
 			statusShow: false,
+			cancelShow: false,
 			meetingCover: [],
 			detailImg: [],
 			isEdit: false
 		};
 	},
 	onLoad(options) {
-		this.$on("changeRow", (row) => {
-			console.log("????")
-			if(row) {
-				const model = row
-				this.meetingTime = this.$u.timeFormat(model.startTime, "yyyy-mm-dd HH:mm:ss") + " ~ " + this.$u.timeFormat(model.endTime, "yyyy-mm-dd HH:mm:ss")
-				model.meetingStatus = this.statusOptions.find(item => item.value == model.meetingStatus).name
-				this.meetingCover.push({
-					url: model.meetingCover
-				})
-				this.detailImg.push({
-					url: model.detailImg
-				})
-				this.model = model
-				this.isEdit = true
-			} else {
-				this.isEdit = false
-			}
-		})
+		console.log(options)
+		if(options.row) {
+			const model = JSON.parse(options.row)
+			this.meetingTime = this.$u.timeFormat(model.startTime, "yyyy-mm-dd hh:MM:ss") + " ~ " + this.$u.timeFormat(model.endTime, "yyyy-mm-dd HH:mm:ss")
+			model.meetingStatus = this.statusOptions.find(item => item.value == model.meetingStatus).name
+			this.meetingCover.push({
+				url: model.meetingCover
+			})
+			this.detailImg.push({
+				url: model.detailImg
+			})
+			this.model = model
+			this.isEdit = true
+		} else {
+			this.isEdit = false
+		}
 	},
 	methods: {
+		cancel() {
+			api.deleteMeeting({ id: this.model.id }).then(() => {
+				uni.$u.toast('删除成功');
+				this.cancelShow = false
+			})
+		},
 		openSelect(name) {
 			this[name] = true
 			uni.hideKeyboard()

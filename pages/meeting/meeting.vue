@@ -2,12 +2,20 @@
 	<view class="meeting">
 		<view class="m-h">
 			<view class="list-header">
-				<view class="title-year"><u--text :size="20" type="primary" :text="nowYear"></u--text></view>
+				<view class="title-year"><u--text :size="20" type="warning" :text="nowYear"></u--text></view>
 				<view class="title-search">
 					<u--input @confirm="search" placeholder="请输入内容" suffixIcon="search" suffixIconStyle="font-size: 22px;color: #909399"></u--input>
 				</view>
 			</view>
-			<view><u-tabs :list="timeList" @click="click"></u-tabs></view>
+			<view>
+				<u-tabs 
+					:list="timeList" 
+					@click="click"
+					lineColor="#f9ae3d"
+					:inactiveStyle="{ color: '#ffffff' }"
+					:activeStyle="{ color: '#f9ae3d' }"
+				></u-tabs>
+			</view>
 		</view>
 
 		<view class="list">
@@ -62,10 +70,9 @@ export default {
 	},
 	methods: {
 		toEdit(row) {
-			this.$emit("changeRow", row)
-			uni.switchTab({
-				// url: `/pages/my/my?row=${encodeURIComponent(JSON.stringify(row))}`
-				url: `/pages/my/my`
+			uni.reLaunch({
+				url: `/pages/my/my?row=${encodeURIComponent(JSON.stringify(row))}`
+				// url: `/pages/my/my`
 			});
 		},
 		init() {
@@ -113,12 +120,22 @@ export default {
 
 <style lang="scss" scoped>
 .meeting {
-	background-color: #ececec;
-	margin: 0px;
-	background: url(@/static/bg.jpg) no-repeat;
-	background-size: 100% 100%;
-	background-attachment: fixed;
-	// opacity: 0.8;
+	position: relative;
+	&::after {
+		z-index: -1;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		content: " ";
+		opacity: 0.9;
+		background-color: #ececec;
+		margin: 0px;
+		background: url(@/static/bg.jpg) no-repeat;
+		background-size: 100% 100%;
+		background-attachment: fixed;
+	}
 }
 .list-header {
 	display: flex;
@@ -137,6 +154,7 @@ export default {
 	margin-top: 16px;
 	padding: 0 10px;
 	.card {
+		background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
 		padding: 20px;
 		border-radius: 10px;
 		background-color: #ffffff;
@@ -149,6 +167,9 @@ export default {
 	.card-bottom {
 		display: flex;
 		justify-content: space-between;
+		.card-content {
+			margin-right: 10px;
+		}
 	}
 }
 </style>
