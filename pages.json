@@ -4,21 +4,23 @@
 			"path": "pages/meeting/freeMeeting",
 			"style": {
 				"navigationStyle": "custom",
-				"enablePullDownRefresh": false
-				// "navigationBarTitleText": "会议列表"
+				"enablePullDownRefresh": false,
+				"navigationBarTitleText": "会议列表"
 			}
 		},
 		{
 			"path": "pages/meeting/meeting",
 			"style": {
 				"navigationStyle": "custom",
-				"enablePullDownRefresh": false
-				// "navigationBarTitleText": "会议列表"
+				"enablePullDownRefresh": false,
+				"navigationBarTitleText": "会议列表"
 			}
 		},
 		{
 			"path": "pages/my/my",
 			"style": {
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false,
 				"navigationBarTitleText": "添加会议"
 			}
 		}
@@ -26,8 +28,9 @@
             "path" : "pages/info/info",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "会议详情",
-                "enablePullDownRefresh": false
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false,
+                "navigationBarTitleText": "会议详情"
             }
             
         }
