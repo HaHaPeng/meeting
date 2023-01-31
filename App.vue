@@ -14,5 +14,11 @@
 
 <style lang="scss">
 	/*每个页面公共css */
-	@import 'uview-ui/index.scss'
+@import 'uview-ui/index.scss';
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
 </style>

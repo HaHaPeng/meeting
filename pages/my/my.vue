@@ -1,5 +1,10 @@
 <template>
 	<u-transition :show="animationShow" mode="fade-right">
+		<u-overlay :show="loading" :duration="400" :z-index ="999">
+			<view class="loading">
+				<u-loading-icon vertical textColor="#3c9cff" text="提交中..." color="#3c9cff"></u-loading-icon>
+			</view>
+		</u-overlay>
 		<view class="add-meeting">
 			<u--form labelPosition="left" labelWidth="80" :model="model" :rules="rules" ref="form">
 				<u-form-item
@@ -81,6 +86,7 @@ import api from "@/config/api.js"
 export default {
 	data() {
 		return {
+			loading: false,
 			endTimeShow: false,
 			startTimeShow: false,
 			defaultModel: {
@@ -148,9 +154,14 @@ export default {
 			this.init()
 		}
 	},
+	onTabItemTap() {
+		this.init()
+	},
 	methods: {
 		init() {
 			this.model = JSON.parse(JSON.stringify(this.defaultModel))
+			this.meetingCover = []
+			this.detailImg = []
 		},
 		goToMeeting() {
 			setTimeout(() => {
@@ -161,11 +172,13 @@ export default {
 			}, 1000)
 		},
 		cancel() {
+			this.loading = true
 			api.deleteMeeting({ id: this.model.id }).then(() => {
 				uni.$u.toast('删除成功');
 				this.cancelShow = false
 				this.goToMeeting()
-			})
+				this.loading = false
+			}).catch(() => this.loading = false)
 		},
 		openSelect(name) {
 			this[name] = true
@@ -236,6 +249,7 @@ export default {
 			});
 		},
 		submit() {
+			this.loading = true
 			const data = JSON.parse(JSON.stringify(this.model))
 			data.meetingStatus = this.statusOptions.find(item => item.name == data.meetingStatus).value
 			this.$refs.form
@@ -245,12 +259,14 @@ export default {
 						api.updateMeeting(data).then(() => {
 							uni.$u.toast('更新成功');
 							this.goToMeeting()
-						})
+							this.loading = false
+						}).catch(() => this.loading = false)
 					} else {
 						api.addMeeting(data).then(() => {
 							uni.$u.toast('添加成功');
 							this.goToMeeting()
-						})
+							this.loading = false
+						}).catch(() => this.loading = false)
 					}
 				})
 				.catch(errors => {

@@ -76,6 +76,7 @@
 
 <script>
 import api from '@/config/api.js';
+import { mapMutations } from "vuex"
 export default {
 	data() {
 		return {
@@ -105,9 +106,11 @@ export default {
 		};
 	},
 	onLoad() {
+		this.clearStore()
 		this.init();
 	},
 	methods: {
+		...mapMutations(["clearStore"]),
 		chooseTimeType(type) {
 			this.timeShow = false
 			if(type === "single") {
@@ -283,7 +286,7 @@ export default {
 	}
 }
 .list {
-	height: calc(100vh - 167px);
+	height: calc(100vh - 117px);
 	margin-top: 16px;
 	padding: 0 10px;
 	padding-bottom: 10px;

@@ -71,22 +71,22 @@
     "uniStatistics" : {
         "enable" : false
     },
-	"h5" : {
-		"title" : "meeting",
-		"devServer" : {
-			"https" : false,//是否启用https协议
-			"disableHostCheck":true,//设置跳过host检查
-			"proxy": {  
-				"/hospital": {  
-					"target": "http://120.77.243.135:8090",//目标接口域名
-					"changeOrigin": true,//是否跨域
-					"secure": false, //设置支持https协议的代理
-					"pathRewrite": {
-						"^/hospital": "/hospital"
-					}
-				}
-			}  
-		}
-	},
+    "h5" : {
+        "title" : "meeting",
+        "devServer" : {
+            "https" : false, //是否启用https协议
+            "disableHostCheck" : true, //设置跳过host检查
+            "proxy" : {
+                "/hospital" : {
+                    "target" : "http://120.77.243.135:8090", //目标接口域名
+                    "changeOrigin" : true, //是否跨域
+                    "secure" : false, //设置支持https协议的代理
+                    "pathRewrite" : {
+                        "^/hospital" : "/hospital"
+                    }
+                }
+            }
+        }
+    },
     "vueVersion" : "2"
 }
