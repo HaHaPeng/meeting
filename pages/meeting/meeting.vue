@@ -22,7 +22,7 @@
 						</u--input>
 					</view>
 				</view>
-				<view><u-tabs :list="timeList" @click="chooseMonth" lineColor="#f9ae3d" :inactiveStyle="{ color: '#ffffff' }" :activeStyle="{ color: '#f9ae3d' }"></u-tabs></view>
+				<view><u-tabs :current="currenMonth" :list="timeList" @click="chooseMonth" lineColor="#f9ae3d" :inactiveStyle="{ color: '#ffffff' }" :activeStyle="{ color: '#f9ae3d' }"></u-tabs></view>
 			</view>
 
 			<view class="list">
@@ -38,16 +38,16 @@
 								</view>
 								<view class="card-label">
 									<u--text
-										type="warning"
+										:type="statusType(card.meetingStatus)"
 										prefixIcon="calendar-fill"
 										:size="16"
-										iconStyle="font-size: 22px; color: #f9ae3d;margin-right: 8px;"
-										text="可预约"
+										:iconStyle="`font-size: 22px; color: ${statusColor(card.meetingStatus)};margin-right: 8px;`"
+										:text="statusText(card.meetingStatus)"
 									></u--text>
 								</view>
 							</view>
 							<view class="card-bottom">
-								<view class="card-content"><u--text :size="18" bold :lines="2" :text="card.meetingDesc"></u--text></view>
+								<view class="card-content"><u--text :size="18" bold :lines="2" :text="card.meetingName"></u--text></view>
 								<view class="card-img"><u-image width="120px" height="70px" shape="square" radius="5" :src="card.meetingCover" :lazy-load="true"></u-image></view>
 							</view>
 						</view>
@@ -101,13 +101,39 @@ export default {
 				content: ''
 			},
 			doubleShow: false,
-			timeShow: false
+			timeShow: false,
+			statusMap: {
+				1: {
+					text: "未开始",
+					color: "#5ac725",
+					type: "success"
+				},
+				2: {
+					text: "进行中",
+					color: "#f9ae3d",
+					type: "warning"
+				},
+				3: {
+					text: "已结束",
+					color: "#909399",
+					type: "info"
+				}
+			}
 		};
 	},
 	onLoad() {
 		this.init();
 	},
 	methods: {
+		statusType(val) {
+			return this.statusMap[val].type
+		},
+		statusText(val) {
+			return this.statusMap[val].text
+		},
+		statusColor(val) {
+			return this.statusMap[val].color
+		},
 		chooseTimeType(type) {
 			this.timeShow = false
 			if(type === "single") {

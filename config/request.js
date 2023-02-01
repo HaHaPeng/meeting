@@ -1,3 +1,4 @@
+import store from "@/store/index.js"
 // 此vm参数为页面的实例，可以通过它引用vuex中的变量
 module.exports = (vm) => {
     // 初始化请求配置
@@ -22,7 +23,9 @@ module.exports = (vm) => {
 			// 可以在此通过vm引用vuex中的变量，具体值在vm.$store.state中
 			config.header.token = vm.$store.state.userInfo.token
 		}
-		config.header.token = "8903ce60fafd45d89ad5a455d9761adf"
+		if(Boolean(store.state.token)) {
+			config.header.token = store.state.token
+		}
 	    return config 
 	}, config => { // 可使用async await 做异步操作
 	    return Promise.reject(config)
