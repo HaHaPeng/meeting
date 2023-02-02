@@ -27,7 +27,7 @@
 			<view style="margin-bottom: 10px;"><u--text type="primary" bold text="会议内容:" size="16" color="#767a82"></u--text></view>
 			<u-read-more toggle showHeight="200" :shadowStyle="shadowStyle"><rich-text :nodes="row.meetingDesc"></rich-text></u-read-more>
 			<u-line color="#2979ff" dashed margin="10px 0"></u-line>
-			<view class="info-image"><u--image :src="row.detailImg" mode="widthFix" width="100%"></u--image></view>
+			<view class="info-image"><image :src="row.detailImg" mode="widthFix" width="100%"></image></view>
 			<view v-if ="isLogin" style="height: 10px;"></view>
 			<u-button v-if="isLogin" color="#f29100" @click="link">编辑</u-button>
 			<view v-if ="isLogin" style="height: 20px;"></view>
@@ -122,6 +122,12 @@ export default {
 		flex: 2;
 		display: flex;
 		align-items: center;
+	}
+}
+.info-image {
+	text-align: center;
+	image {
+		width: 100%;
 	}
 }
 </style>
