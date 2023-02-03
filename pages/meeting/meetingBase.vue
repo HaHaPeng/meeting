@@ -162,23 +162,26 @@ export default {
 		chooseMonth(val) {
 			this.currenMonth = val.index;
 			this.nowMonth = val.value;
-			const nowMonth = val.value
+			// const nowMonth = val.value
+			
 			// this.monthShow = true;
 			// this.timeShow = true;
 			// const day = this.$u.timeFormat(new Date(), 'yyyy-mm-dd')
 			// this.minDate = day;
 			// this.maxDate = this.$u.timeFormat(new Date(this.nowYear, this.nowMonth, 0), 'yyyy-mm-dd');
 			// this.defaultDate = this.defaultDate ? this.defaultDate : `${this.nowYear}-${this.nowMonth}-01`;
-			
-			const fd = this.$u.timeFormat(new Date(this.nowYear, nowMonth - 1, 1, 0, 0, 0), 'yyyy-mm-dd hh:MM:ss')
-			const ld = this.$u.timeFormat(new Date(this.nowYear, nowMonth, 0, 23, 59, 59), 'yyyy-mm-dd hh:MM:ss')
+			this.getMonthFirstDayAndLastDay(this.nowYear, this.nowMonth)
+			this.getList();
+		},
+		getMonthFirstDayAndLastDay(year, month) {
+			const fd = this.$u.timeFormat(new Date(year, month - 1, 1, 0, 0, 0), 'yyyy-mm-dd hh:MM:ss')
+			const ld = this.$u.timeFormat(new Date(year, month, 0, 23, 59, 59), 'yyyy-mm-dd hh:MM:ss')
 			console.log(fd, ld)
 			const firstDay = new Date(fd).getTime();
 			const lastDay = new Date(ld).getTime();
 			this.params.page = 1
 			this.params.startTime = firstDay
 			this.params.endTime = lastDay
-			this.getList();
 		},
 		yearConfirm(val) {
 			const year = val.value[0];
@@ -190,7 +193,8 @@ export default {
 				this.currenMonth = -1
 				this.forMateYear()
 			} else {
-				this.params.startTime = new Date(`${year}-${arr[1]}-${arr[2]}`).getTime();
+				this.getMonthFirstDayAndLastDay(year, this.nowMonth)
+				// this.params.startTime = new Date(`${year}-${arr[1]}-${arr[2]}`).getTime();
 			}
 			this.getList();
 		},
@@ -255,13 +259,9 @@ export default {
 				this.currenMonth = -1
 				this.forMateYear()
 			} else {
-				const m = new Date().getMonth()
-				this.chooseMonth({
-					index: m,
-					value: m + 1
-				})
+				this.currenMonth = -1
 			}
-			this.$u.throttle(this.getList, 5000);
+			this.$u.throttle(this.getList(false, "search"), 5000);
 		},
 		scrolltolower() {
 			if(this.totalPage > this.params.page) {
@@ -269,7 +269,24 @@ export default {
 				this.getList(true);
 			}
 		},
-		async getList(isAdd) {
+		changeBadge(isShow, data, type) {
+			if(isShow) {
+				const existMonth = data[this.nowYear] ? data[this.nowYear] : []
+				this.timeList.forEach(item => {
+					if(existMonth.includes(item.value)) {
+						item.badge.isDot = true
+					} else {
+						item.badge.isDot = false
+					}
+				})
+			} else {
+				this.timeList.forEach(item => item.badge.isDot = false)
+				if(type == "search") {
+					this.currenMonth = this.nowMonth - 1
+				}
+			}
+		},
+		async getList(isAdd, type) {
 			this.loading = true;
 			await api
 				.getMeeting(this.params)
@@ -287,16 +304,9 @@ export default {
 						this.cardList = list
 					}
 					if(this.params.content && res.hasMonth) {
-						const existMonth = res.hasMonth[this.nowYear] ? res.hasMonth[this.nowYear] : []
-						this.timeList.forEach(item => {
-							if(existMonth.includes(item.value)) {
-								item.badge.isDot = true
-							} else {
-								item.badge.isDot = false
-							}
-						})
+						this.changeBadge(true, res.hasMonth, type)
 					} else {
-						this.timeList.forEach(item => item.badge.isDot = false)
+						this.changeBadge(false, {}, type)
 					}
 					this.loading = false;
 				})
