@@ -32,7 +32,7 @@
 						<view class="card" @click="toEdit(card)">
 							<view class="card-top">
 								<view class="card-date">
-									<u--text type="primary" bold :size="18" :text="card.time"></u--text>
+									<u--text type="primary" bold :size="16" :text="card.time"></u--text>
 									<!-- <view class="card-day"><u--text type="primary" bold :size="22" text="主色"></u--text></view> -->
 									<!-- <view class="card-time"><u--text type="primary" bold :size="22" text="主色"></u--text></view> -->
 								</view>
@@ -292,8 +292,8 @@ export default {
 				.getMeeting(this.params)
 				.then(res => {
 					const list = res.records.map(item => {
-						const startStr = this.$u.timeFormat(item.startTime, 'dd日 hh:MM');
-						const endStr = this.$u.timeFormat(item.endTime, 'dd日 hh:MM');
+						const startStr = this.$u.timeFormat(item.startTime, 'mm月dd日 hh:MM');
+						const endStr = this.$u.timeFormat(item.endTime, 'mm月dd日 hh:MM');
 						item.time = startStr + ' ~ ' + endStr;
 						return item;
 					});
