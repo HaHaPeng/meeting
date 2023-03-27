@@ -12,7 +12,7 @@
 				<view class="info-value"><u--text :lines="1" :text="$u.timeFormat(row.endTime, 'yyyy-mm-dd hh:MM:ss')" size="14" color="#767a82"></u--text></view>
 			</view>
 			<view class="info-cell">
-				<view class="info-label"><u--text text="会议主讲人:" type="primary" align="right" bold size="16" color="#f9ae3d"></u--text></view>
+				<view class="info-label"><u--text text="会议主席:" type="primary" align="right" bold size="16" color="#f9ae3d"></u--text></view>
 				<view class="info-value"><u--text :lines="1" :text="row.meetingSpeaker" size="14" color="#767a82"></u--text></view>
 			</view>
 			<view class="info-cell">

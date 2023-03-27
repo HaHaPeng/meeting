@@ -26,6 +26,8 @@ module.exports = (vm) => {
 		if(Boolean(store.state.token)) {
 			config.header.token = store.state.token
 		}
+		
+		config.header["X-Frame-Options"] = "SAMEORIGIN"
 	    return config 
 	}, config => { // 可使用async await 做异步操作
 	    return Promise.reject(config)

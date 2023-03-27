@@ -35,8 +35,8 @@
 					<u-icon slot="right" name="arrow-right"></u-icon>
 				</u-form-item>
 				<u-form-item label="名称" prop="meetingName" borderBottom><u--input v-model="model.meetingName" border="none" placeholder="请输入名称"></u--input></u-form-item>
-				<u-form-item label="主讲人" prop="meetingSpeaker" borderBottom>
-					<u--input v-model="model.meetingSpeaker" border="none" placeholder="请输入主讲人"></u--input>
+				<u-form-item label="会议主席" prop="meetingSpeaker" borderBottom>
+					<u--input v-model="model.meetingSpeaker" border="none" placeholder="请输入会议主席"></u--input>
 				</u-form-item>
 				<u-form-item label="所属部门" prop="dept" borderBottom><u--input v-model="model.dept" border="none" placeholder="请输入所属部门"></u--input></u-form-item>
 				
@@ -94,7 +94,7 @@ export default {
 				endTime: new Date().getTime(), // 会议结束时间
 				meetingName: '', // 会议名称
 				meetingDesc: '', // 会议描述
-				meetingSpeaker: '', // 会议主讲人
+				meetingSpeaker: '', // 会议主席
 				meetingStatus: null, // 会议状态，1-未开始，2-进行中，3-已结束
 				meetingCover: '', // 会议封面
 				dept: '', // 所属部门

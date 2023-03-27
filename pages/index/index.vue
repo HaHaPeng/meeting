@@ -1,7 +1,6 @@
 <template>
 	<view class="content">
-		<!-- <u-button>ddd</u-button> -->
-		{{ title }}
+		<web-view src="https://www.baidu.com"></web-view>
 	</view>
 </template>
 
@@ -23,10 +22,12 @@
 
 <style>
 	.content {
-		display: flex;
+/* 		width: 100%;
+		height: 100vh; */
+/* 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
+		justify-content: center; */
 	}
 
 	.logo {
