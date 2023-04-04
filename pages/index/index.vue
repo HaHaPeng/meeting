@@ -1,6 +1,6 @@
 <template>
 	<view class="content">
-		<web-view src="https://www.baidu.com"></web-view>
+		<web-view src="http://10.32.159.64:5244"></web-view>
 	</view>
 </template>
 

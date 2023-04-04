@@ -23,6 +23,14 @@
 				"enablePullDownRefresh": false,
 				"navigationBarTitleText": "添加会议"
 			}
+		},
+		{
+			"path": "pages/pdf/index",
+			"style": {
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false,
+				"navigationBarTitleText": "文件列表"
+			}
 		}
 	    ,{
             "path" : "pages/info/info",

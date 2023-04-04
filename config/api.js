@@ -13,6 +13,10 @@ api.addMeeting = (params, config = {}) => http.post('/meeting/add', params, conf
 api.updateMeeting = (params, config = {}) => http.post('/meeting/update', params, config)
 // 删除会议
 api.deleteMeeting = (params, config = {}) => http.post('/meeting/delete', params, config)
+// pdf列表
+api.getPDF = (data) => http.get('/file/list', { data })
+// pdf
+api.deletePDF = (data) => http.delete(`/file/${data.id}`, {})
 
 
 export default api
