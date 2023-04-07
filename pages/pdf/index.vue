@@ -7,7 +7,9 @@
 						<u--text :lines="2" :text="item.fileName"></u--text>
 					</view>
 					<view slot="value" class="pdf-btn">
-						<u-icon size="20" name="download" @tap="onDownload(item.fileUrl)"></u-icon>
+						<u-icon size="20" name="eye" @tap="link(item.fileUrl)"></u-icon>
+						<view class="empty-blank"></view>
+						<u-icon size="20" name="download" @tap="onDownload(item.fileName, item.id, item.fileUrl)"></u-icon>
 						<view class="empty-blank"></view>
 						<u-icon size="20" name="trash" @tap="onTrash(item.id)"></u-icon>
 					</view>
@@ -16,7 +18,11 @@
 			</u-list-item>
 		</u-list>
 		
-		<u-modal @confirm="confirm" @cancel="show = false" :show="show" title="提示" content='确认删除？'></u-modal>
+		<u-modal @confirm="confirm" :showCancelButton="true" @cancel="show = false" :show="show" title="提示" content='确认删除？'></u-modal>
+		
+		<view class="pdf-add">
+			<u-icon size="60" name="plus-circle-fill" @tap="upload"></u-icon>
+		</view>
 	</view>
 </template>
 
@@ -36,11 +42,43 @@ export default {
 		};
 	},
 	onLoad() {
-		this.params.page = 1
-		this.totalPages = 1
-		this.loadmore();
+		this.initBygetList()
 	},
 	methods: {
+		initBygetList() {
+			this.params.page = 1
+			this.totalPages = 1
+			this.indexList = []
+			this.loadmore();
+		},
+		creatA(url) {
+			const a = document.createElement('a');
+			a.href = url; // 下载链接
+			a.style.display = 'none';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		},
+		upload() {
+			uni.chooseFile({
+			  success: (res) => {
+			    const tempFilePaths = res.tempFilePaths;
+			    uni.uploadFile({
+			      url: '/hospital/file/upload', // 上传接口的 URL
+			      filePath: tempFilePaths[0], // 选择的文件路径
+			      name: 'file', // 上传文件的字段名
+			      success:  (res) => {
+			        console.log('上传成功', res);
+					uni.$u.toast('上传成功！');
+					this.initBygetList()
+					uni.$u.toast('上传失败！');
+			        console.log('上传失败', err);
+			        // 处理上传失败后的逻辑
+			      }
+			    });
+			  }
+			});
+		},
 		scrolltolower() {
 			if(this.params.page >= this.totalPages) {
 				uni.$u.toast('没有更多内容了！');
@@ -50,15 +88,11 @@ export default {
 				this.loadmore();
 			}
 		},
-		onDownload(url) {
-			uni.downloadFile({
-				url,
-				success: (res) => {
-					if (res.statusCode === 200) {
-						console.log('下载成功');
-					}
-				}
-			});
+		link(url) {
+			this.creatA(url)
+		},
+		onDownload(name = "default.pdf",id, url) {
+			this.creatA((`/hospital/file/download?id=${id}`))
 		},
 		onTrash(id) {
 			this.id = id
@@ -68,16 +102,14 @@ export default {
 			this.show = false
 			api.deletePDF({id: this.id}).then(() => {
 				uni.$u.toast('删除成功！');
-				this.params.page = 1
-				this.totalPages = 1
-				this.loadmore()
+				this.initBygetList()
 			}).catch(() => uni.$u.toast('删除失败!'))
 		},
 		async loadmore() {
 			await api.getPDF(this.params)
 			.then(res => {
 				this.totalPages = res.totalPages
-				this.indexList = res.records
+				this.indexList = this.indexList.concat(res.records)
 			}).catch(err => console.log(err))
 		}
 	}
@@ -85,8 +117,15 @@ export default {
 </script>
 
 <style>
+	.pdf-add {
+		position: fixed;
+		left: 20px;
+		bottom: 20px;
+		width: 60px;
+		height: 60px;
+	}
 	.pdf-title {
-		max-width: 70%;
+		max-width: 65%;
 	}
 	.pdf-btn {
 		display: flex;

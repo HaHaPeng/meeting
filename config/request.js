@@ -16,6 +16,7 @@ module.exports = (vm) => {
 	
 	// 请求拦截
 	uni.$u.http.interceptors.request.use((config) => { // 可使用async await 做异步操作
+		console.log(config)
 	    // 初始化请求拦截器时，会执行此方法，此时data为undefined，赋予默认{}
 	    config.data = config.data || {}
 		// 根据custom参数中配置的是否需要token，添加对应的请求头
@@ -27,7 +28,10 @@ module.exports = (vm) => {
 			config.header.token = store.state.token
 		}
 		
-		config.header["X-Frame-Options"] = "SAMEORIGIN"
+		if(config.responseType) {
+			config.header.responseType = config.responseType
+		}
+		
 	    return config 
 	}, config => { // 可使用async await 做异步操作
 	    return Promise.reject(config)
@@ -35,8 +39,9 @@ module.exports = (vm) => {
 	
 	// 响应拦截
 	uni.$u.http.interceptors.response.use((response) => { /* 对响应成功做点什么 可使用async await 做异步操作*/
-	console.log(response)
+		console.log(response)
 		const data = response.data
+		if(response.config.responseType && response.config.responseType == "blob") return data;
 
 		// 自定义参数
 		const custom = response.config?.custom

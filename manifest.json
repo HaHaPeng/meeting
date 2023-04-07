@@ -85,14 +85,14 @@
                         "^/hospital" : "/hospital"
                     }
                 },
-				"/pdf" : {
-				    "target" : "http://120.77.243.135", //目标接口域名
-				    "changeOrigin" : true, //是否跨域
-				    "secure" : false, //设置支持https协议的代理
-				    "pathRewrite" : {
-				        "^/hospital" : "/pdf"
-				    }
-				}
+                "/pdf" : {
+                    "target" : "http://120.77.243.135", //目标接口域名
+                    "changeOrigin" : true, //是否跨域
+                    "secure" : false, //设置支持https协议的代理
+                    "pathRewrite" : {
+                        "^/hospital" : "/pdf"
+                    }
+                }
             }
         }
     },

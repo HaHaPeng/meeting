@@ -17,6 +17,7 @@ api.deleteMeeting = (params, config = {}) => http.post('/meeting/delete', params
 api.getPDF = (data) => http.get('/file/list', { data })
 // pdf
 api.deletePDF = (data) => http.delete(`/file/${data.id}`, {})
+api.downloadPDF = (data) => http.get(`/file/download?id=${data.id}`, { responseType: 'blob' })
 
 
 export default api
